@@ -5,24 +5,27 @@ public class Test10 {
     public static void main(String[] args) {
         // Scanner 클래스를 사용하여 키보드로 정수값을 입력 받아서 1부터 입력 받은 정수값까지의 총
 //    	합을 구하는 실습. 단, 음수 및 0 을 입력한 경우에는 다시 입력 받는다. 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("정수 3개를 입력해봐");    
-        int a = sc.nextInt();
-        int b = sc.nextInt();
-        int c = sc.nextInt();
-        int maxs = 0;
-        if ( a>b && a>c) {
-        	maxs = a;
-        }else if (a<b && b > c) {
-        	maxs = b;
-        }else {
-        	maxs = c;
-        }
+        Scanner sc = new Scanner(System.in);  
+        int a ;
 
-        System.out.println("a 값 : " + a);
-        System.out.println("b 값 : " + b);
-        System.out.println("c 값 : " + c);
-        System.out.println("최댓값 : " + maxs);
+
+        while (true) {
+            System.out.println("양의 정수를 입력하시오"); 
+            a = sc.nextInt();
+            
+            if (a>0) {
+            	break;
+            }else {
+            	System.out.println("다시 입력하세요");
+            }
+        }
+        System.out.printf("n의 값 : %d\n" , a);
+        int sum = 0;
+        for (int i = 1; i <= a; i++) {
+        	sum +=i;
+			
+		}System.out.printf("1부터 %d 까지의 총합 : %d",a,sum);
+
         
         sc.close();
     	
