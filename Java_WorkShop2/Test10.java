@@ -12,12 +12,16 @@ public class Test10 {
 		// Scanner 이용하여 값을 입력 받는 코드 구현
 		
 		System.out.println("주소를 입력하세요");
-		String address = sc.nextLine();
-		String[] address2 = address.split(" ");
+//		String address = sc.nextLine();
+//		String[] address2 = address.split(" ");
 		
-		String si = address2[0];
-		String gu = address2[1];
-		String dong= address2[2];
+//		String si = address2[0];
+//		String gu = address2[1];
+//		String dong= address2[2];
+		
+		String si = sc.next();
+		String gu = sc.next();
+		String dong = sc.next();
 		
 		System.out.println("시명 : " + si);
 		System.out.println("구명 : " + gu);
