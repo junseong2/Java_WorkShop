@@ -15,6 +15,7 @@ public class Test23 {
     	} 
     	 
     	System.out.println("입력하신 숫자의 총합:"+sum); 
+    sc.close();
     }
 }
 
