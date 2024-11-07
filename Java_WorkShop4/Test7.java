@@ -1,5 +1,6 @@
 package Java_WorkShop4;
 import java.util.Scanner;
+import java.util.Random;
 
 
 public class Test7 {
@@ -8,6 +9,7 @@ public class Test7 {
 		// Scanner 클래스를 사용하여 입력 받은 사람 수 만큼 랜덤하게 키(height)값을 구하여 실행결
 //		과와 같이 출력하도록 구현. ( Random 클래스 사용 ) -- 아직 안배움
 		Scanner sc = new Scanner(System.in);
+		Random ran = new Random();
 		System.out.println("키의 최대값을 구합니다.");
 		System.out.print("사람수 : ");
 		int k = sc.nextInt();
@@ -15,8 +17,9 @@ public class Test7 {
 		int [] n = new int [k];
 		
 		for (int i = 0; i < k; i++) {
-			System.out.print("사람 "+(i+1)+ " : ");
-			n[i] = sc.nextInt();
+			n[i] = 100+ran.nextInt(90);
+			System.out.print("사람 "+(i+1)+ " : " + n[i]);
+			
 			System.out.println();
 		}
 		
