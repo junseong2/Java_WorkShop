@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.config.StudentMapper">
+
+<resultMap id="StudentResultMap" type="com.dto.StudentDTO">
+    <result property="stuNo" column="STUDENT_NO" />
+    <result property="departNo" column="DEPARTMENT_NO" />
+    <result property="stuName" column="STUDENT_NAME" />
+    <result property="stuSsn" column="STUDENT_SSN" />
+    <result property="stuAddress" column="STUDENT_ADDRESS" />
+    <result property="entDate" column="ENTRANCE_DATE" />
+    <result property="absYn" column="ABSENCE_YN" />
+    <result property="coachProfessorNo" column="COACH_PROFESSOR_NO" />
+    <association property="grade" javaType="com.dto.StudentDTO2">
+        <result property="termNo" column="TERM_NO"/>
+        <result property="studentNo" column="STUDENT_NO"/>
+        <result property="classNo" column="CLASS_NO"/>
+        <result property="point" column="POINT"/>
+        <result property="className" column="CLASS_NAME"/>
+        <result property="grade" column="GRADE"/> 
+        <result property="StudentName" column="StudentName"/> 
+    </association>
+</resultMap>
+<!-- 1. 모든 학생정보 조회-->
+    <select id="findAll" resultType="com.dto.StudentDTO" resultMap="StudentResultMap">
+    	select
+    		student_no,student_name,
+    		concat(substr(student_ssn,1,8),'****') as student_ssn,
+    		concat(substr(student_address,1,10),'...') as student_address,
+    		date_format(entrance_date,'%Y/%m/%d') as entrance_date,
+    		absence_yn,coach_professor_no
+    	from tb_student
+    </select>
+    
+    
+<!-- 2. 학생 이름 조회-->
+       <select id="findName" resultType="com.dto.StudentDTO" resultMap="StudentResultMap"
+       parameterType="String">
+    	select
+    		student_no,student_name,
+    		concat(substr(student_ssn,1,8),'****') as student_ssn,
+		    	case 
+		    		when student_address is null then '***주소 미상***'
+		    		else concat(substr(student_address,1,10),'...')
+		    		end as student_address,
+    		date_format(entrance_date,'%Y/%m/%d') as entrance_date,
+    		absence_yn,coach_professor_no
+    	from tb_student
+		where student_name LIKE concat('%', #{student_name}, '%')
+    </select>
+    
+    
+<!-- 3. 학생 입학년도 조회-->
+   <select id="findYear" resultType="com.dto.StudentDTO" resultMap="StudentResultMap" parameterType="int">
+    	select
+    		student_no,student_name,
+    		concat(substr(student_ssn,1,8),'****') as student_ssn,
+		    	case 
+		    		when student_address is null then '***주소 미상***'
+		    		else concat(substr(student_address,1,10),'...')
+		    		end as student_address,
+    		date_format(entrance_date,'%Y/%m/%d') as entrance_date,
+    		absence_yn,coach_professor_no
+    	from tb_student
+		where year(entrance_date) between #{start_year} and #{end_year}   
+   </select>
+   
+   
+<!-- 4. 학생 학번 다중 조회-->
+    <select id="findNo" resultType="com.dto.StudentDTO" resultMap="StudentResultMap" parameterType="list">
+    	select
+    		student_no,student_name,
+    		concat(substr(student_ssn,1,8),'****') as student_ssn,
+		    	case 
+		    		when student_address is null then '***주소 미상***'
+		    		else concat(substr(student_address,1,10),'...')
+		    		end as student_address,
+    		date_format(entrance_date,'%Y/%m/%d') as entrance_date,
+    		absence_yn,coach_professor_no
+    	from tb_student
+		<where>
+			student_no IN
+			<foreach item="item" collection="list"  separator="," open="(" close=")">
+				#{item}
+			</foreach>		
+		</where>
+   </select>
+   
+   
+<!-- 5. 학생 휴학 일괄 수정-->
+<update id="updateabs" parameterType="map">
+    update tb_student
+    <set>
+        absence_yn = 'Y'
+    </set>
+    <where>
+        absence_yn = 'N'
+        and student_no IN
+        <foreach item="item" collection="studentNos" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </where>
+</update>
+
+
+<!-- 6. 학생 인원 수정-->
+	<update id="updatecapa" >
+		update tb_department
+		set capacity = 
+			case
+				when capacity between 0 and 20 then CAPACITY +5
+				when capacity between 21 and 25 then CAPACITY +4
+				when capacity between 26 and 30 then CAPACITY +3
+				else capacity
+			end	
+	</update>
+	
+	
+<!-- 7. 학생 학점 조회 -->
+	<select id="stugra" parameterType="list" resultType="com.dto.StudentDTO2">
+		select 
+		    g.term_no as termno, 
+		    s.student_no as studentno, 
+		    s.student_name as StudentName,  
+		    c.class_name as classname, 
+		    g.point, 
+		    case 
+		        when g.point between 0 and 1.9 then 'F 학점'
+		        when g.point between 2.0 and 2.9 then 'D 학점'
+		        when g.point between 3.0 and 3.4 then 'C 학점'
+		        when g.point between 3.5 and 3.9 then 'B 학점'
+		        when g.point >= 4.0 then 'A 학점'
+		    end as grade
+		from tb_student s join tb_grade g on s.student_no = g.student_no
+						join  tb_class c on g.class_no = c.class_no
+		where s.student_no in
+		    <foreach item="studentNo" collection="list" open="(" separator="," close=")">
+		        #{studentNo}
+		    </foreach>
+		order by 
+		    g.term_no;
+	</select>
+
+<!-- 8. 페이징 처리 -->
+	<select id="paging" resultMap="StudentResultMap" parameterType="StudentDTO">
+    	select
+    		student_no,student_name,
+    		concat(substr(student_ssn,1,8),'****') as student_ssn,
+		    	case 
+		    		when student_address is null then '***주소 미상***'
+		    		else concat(substr(student_address,1,10),'...')
+		    		end as student_address,
+    		date_format(entrance_date,'%Y/%m/%d') as entrance_date,
+    		absence_yn,coach_professor_no
+    	from tb_student
+	</select>
+
+	<select id="getTotalCount" resultType="int">
+    select count(*) from tb_student
+	</select>
+</mapper>
